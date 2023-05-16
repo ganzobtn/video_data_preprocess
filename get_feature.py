@@ -1,26 +1,31 @@
 import mediapipe as mp
 import os
 import cv2
-
+import numpy as np
 import argparse
 
-
-
+import time
 parser = argparse.ArgumentParser()
-parser.add_argument('--dataset_path', type=str,
-                    default='/projects/data/arabic_sign_sampled_videos_resized_augmented_3/60')
-parser.add_argument('--model_save_cfg', type=str,
-                    default='arabic_sign_sampled_cfg_60_resized_augmented_3rd')
 
+parser.add_argument('--data_path', type=str,
+                    default='')
+parser.add_argument('--dest_path', type=str,
+                    default ='')
 
 
 opt = parser.parse_args()
+
+
+data_path = '/home/ganzorig/Desktop/test'
+dest_path = '/projects/ZHO/formats/skeleton_sign/'
 
 
 
 mp_drawing = mp.solutions.drawing_utils
 mp_drawing_styles = mp.solutions.drawing_styles
 mp_holistic = mp.solutions.holistic
+
+
 
 
 def get_features(data_path, dest_path):
@@ -34,7 +39,7 @@ def get_features(data_path, dest_path):
     
     out = cv2.VideoWriter(dest_path, cv2.VideoWriter_fourcc(
         *'MP4V'), fps, (frame_width, frame_height))
-
+    
     with mp_holistic.Holistic(
             min_detection_confidence=0.2,
             min_tracking_confidence=0.2) as holistic:
@@ -48,13 +53,15 @@ def get_features(data_path, dest_path):
             # To improve performance, optionally mark the image as not writeable to
             # pass by reference.
             image.flags.writeable = False
+            #blank = image.copy()
 
             image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
             shape = image.shape
             # print(shape)
             blank = np.zeros_like(image)
             results = holistic.process(image)
-            print('ff:', results.right_hand_landmarks)
+            #print('ff:', results.right_hand_landmarks)
+            #print(results.__dir__())
             # Draw landmark annotation on the image.
             image.flags.writeable = True
             image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
@@ -83,9 +90,23 @@ def get_features(data_path, dest_path):
             # Flip the image horizontally for a selfie-view display.
             out.write(blank)
             #cv2.imshow('MediaPipe Holistic', cv2.flip(blank, 1))
-
             #if cv2.waitKey(5) & 0xFF == 27:
             #    break
+    time.sleep(1)
+
     #cv2.destroyWindow('MediaPipe Holistic')
     cap.release()
     out.release()
+
+
+for (root,dirs,files) in os.walk(data_path, topdown=True):
+    print (root)
+    print (dirs)
+    print (files)
+    for file in files:
+        if file.endswith('.mp4'):
+            print(os.path.join(root,file))
+            dest_path_new = os.path.join(dest_path,)
+            #createFolder()
+            #get_features(data_path=os.path.join(root,file), dest_path = os.path.join(root,file))
+    print ('--------------------------------')
