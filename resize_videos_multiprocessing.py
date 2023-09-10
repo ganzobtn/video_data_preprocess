@@ -67,9 +67,12 @@ def resize_video(data_path,dest_path):
 
 # Define your video processing function
 def process_video(file_path):
-    root =file_path[0],file= file_path[1],dest_path_new = file_path[2] 
+    print(len(file_path),type(file_path))
+    root =file_path[0]
+    file= file_path[1]
+    dest_path_new = file_path[2]
     if not os.path.exists(dest_path_new):      
-        os.makedirs(dest_path_new)
+        os.makedirs(dest_path_new,exist_ok= True)
     # You can return some result if needed
     video_path = os.path.join(root,file)
 
