@@ -256,9 +256,11 @@ def get_head_hands(data_path, dest_path):
 
 # Define your video processing function
 def process_video(file_path):
-    root =file_path[0],file= file_path[1],dest_path_new = file_path[2] 
+    root =file_path[0]
+    file= file_path[1]
+    dest_path_new = file_path[2] 
     if not os.path.exists(dest_path_new):      
-        os.makedirs(dest_path_new)
+        os.makedirs(dest_path_new,exist_ok=True)
     # You can return some result if needed
     video_path = os.path.join(root,file)
 
@@ -266,19 +268,19 @@ def process_video(file_path):
 
     return f"Processed {video_path}"
 
-def main():
-    video_dir = "path_to_video_directory"  # Replace with the path to your video directory
-    video_files = [os.path.join(video_dir, file) for file in os.listdir(video_dir) if file.endswith(".mp4")]
-
-    # Create a ThreadPoolExecutor with the number of CPU cores you want to use
-    num_cpus = os.cpu_count()  # This gets the number of available CPU cores
-    with ThreadPoolExecutor(max_workers=num_cpus) as executor:
-        # Process videos in parallel
-        results = list(executor.map(process_video, video_files))
-
-    # Print the results
-    for result in results:
-        print(result)
+#def main():
+#    video_dir = "path_to_video_directory"  # Replace with the path to your video directory
+#    video_files = [os.path.join(video_dir, file) for file in os.listdir(video_dir) if file.endswith(".mp4")]#
+#
+#    # Create a ThreadPoolExecutor with the number of CPU cores you want to use
+#    num_cpus = os.cpu_count()  # This gets the number of available CPU cores
+#    with ThreadPoolExecutor(max_workers=num_cpus) as executor:
+#        # Process videos in parallel
+#        results = list(executor.map(process_video, video_files))#
+#
+#    # Print the results
+#    for result in results:
+#        print(result)
 
 
 def main():
