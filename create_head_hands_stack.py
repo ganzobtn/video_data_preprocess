@@ -16,8 +16,8 @@ parser.add_argument('--dest_path', type=str,
 opt = parser.parse_args()
 
 
-data_path = '/home/ganzorig/Datas/chalearn_processed_full/color/'
-dest_path = '/home/ganzorig/Datas/chalearn_processed_full_skeleton/color/'
+#data_path = '/home/ganzorig/Datas/chalearn_processed_full/color/'
+#dest_path = '/home/ganzorig/Datas/chalearn_processed_full_skeleton/color/'
 
 MARGIN =10
 
@@ -270,8 +270,8 @@ def main():
 
 if __name__=='__main__':
 
-    data_path = '/tmp/data/wlasl_2000/WLASL2000'
-    dest_path = '/tmp/data/wlasl_2000/wlasl_2000_head_hands_stack/WLASL2000'
+    #data_path = '/tmp/data/wlasl_2000/WLASL2000'
+    #dest_path = '/tmp/data/wlasl_2000/wlasl_2000_head_hands_stack/WLASL2000'
     print("Hi")
     main()
     #pass
