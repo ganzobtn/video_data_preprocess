@@ -163,25 +163,25 @@ def get_head_hands(data_path, dest_path):
             image.flags.writeable = True
             image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
 
-            # Right Hand
-            mp_drawing.draw_landmarks(
-               blank, results.right_hand_landmarks, mp_holistic.HAND_CONNECTIONS)
-            #  Left Hand
-            mp_drawing.draw_landmarks(
-               blank, results.left_hand_landmarks, mp_holistic.HAND_CONNECTIONS)
-            mp_drawing.draw_landmarks(
-               blank,
-               results.face_landmarks,
-               mp_holistic.FACEMESH_CONTOURS,
-               landmark_drawing_spec=None,
-               connection_drawing_spec=mp_drawing_styles
-               .get_default_face_mesh_contours_style())
-            mp_drawing.draw_landmarks(
-               blank,
-               results.pose_landmarks,
-               mp_holistic.POSE_CONNECTIONS,
-               landmark_drawing_spec=mp_drawing_styles
-               .get_default_pose_landmarks_style())
+            # # Right Hand
+            # mp_drawing.draw_landmarks(
+            #    blank, results.right_hand_landmarks, mp_holistic.HAND_CONNECTIONS)
+            # #  Left Hand
+            # mp_drawing.draw_landmarks(
+            #    blank, results.left_hand_landmarks, mp_holistic.HAND_CONNECTIONS)
+            # mp_drawing.draw_landmarks(
+            #    blank,
+            #    results.face_landmarks,
+            #    mp_holistic.FACEMESH_CONTOURS,
+            #    landmark_drawing_spec=None,
+            #    connection_drawing_spec=mp_drawing_styles
+            #    .get_default_face_mesh_contours_style())
+            # mp_drawing.draw_landmarks(
+            #    blank,
+            #    results.pose_landmarks,
+            #    mp_holistic.POSE_CONNECTIONS,
+            #    landmark_drawing_spec=mp_drawing_styles
+            #    .get_default_pose_landmarks_style())
             #print('ff:',type(results.face_landmarks))
             #print('ddd:',results.face_landmarks.landmark[0])
             #print('--------------------')
@@ -291,7 +291,7 @@ def main():
                 #if not os.path.exists(dest_path_new):      
                 #    os.makedirs(dest_path_new)
                 #createFolder()
-                file.append([root,file,dest_path_new])
+                file_list.append([root,file,dest_path_new])
                 #get_features(data_path=os.path.join(root,file), dest_path = os.path.join(dest_path_new,file))
 
     num_cpus = os.cpu_count()  # This gets the number of available CPU cores
