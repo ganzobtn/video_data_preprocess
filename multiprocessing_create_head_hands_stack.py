@@ -124,9 +124,7 @@ def get_crop(image, landmarks):
     return min_x,min_y,max_x,max_y, text_x,text_y
 
 def get_head_hands(data_path, dest_path):
-    if not os.path.exists(dest_path_new):      
-        os.makedirs(dest_path_new)
-    
+
     cap = cv2.VideoCapture(data_path)
 
     frame_width, frame_height = int(cap.get(3)), int(cap.get(4))
@@ -268,19 +266,19 @@ def process_video(file_path):
 
     return f"Processed {video_path}"
 
-# def main():
-#     video_dir = "path_to_video_directory"  # Replace with the path to your video directory
-#     video_files = [os.path.join(video_dir, file) for file in os.listdir(video_dir) if file.endswith(".mp4")]
+def main():
+    video_dir = "path_to_video_directory"  # Replace with the path to your video directory
+    video_files = [os.path.join(video_dir, file) for file in os.listdir(video_dir) if file.endswith(".mp4")]
 
-#     # Create a ThreadPoolExecutor with the number of CPU cores you want to use
-#     num_cpus = os.cpu_count()  # This gets the number of available CPU cores
-#     with ThreadPoolExecutor(max_workers=num_cpus) as executor:
-#         # Process videos in parallel
-#         results = list(executor.map(process_video, video_files))
+    # Create a ThreadPoolExecutor with the number of CPU cores you want to use
+    num_cpus = os.cpu_count()  # This gets the number of available CPU cores
+    with ThreadPoolExecutor(max_workers=num_cpus) as executor:
+        # Process videos in parallel
+        results = list(executor.map(process_video, video_files))
 
-#     # Print the results
-#     for result in results:
-#         print(result)
+    # Print the results
+    for result in results:
+        print(result)
 
 
 def main():
@@ -293,13 +291,13 @@ def main():
                 #if not os.path.exists(dest_path_new):      
                 #    os.makedirs(dest_path_new)
                 #createFolder()
-                file_list.append([root,file,dest_path_new])
+                file.append([root,file,dest_path_new])
                 #get_features(data_path=os.path.join(root,file), dest_path = os.path.join(dest_path_new,file))
 
     num_cpus = os.cpu_count()  # This gets the number of available CPU cores
     with ThreadPoolExecutor(max_workers=num_cpus) as executor:
         # Process videos in parallel
-        results = list(executor.map(process_video, file_list))
+        results = list(executor.map(process_video, files))
 
     # Print the results
     for result in results:
