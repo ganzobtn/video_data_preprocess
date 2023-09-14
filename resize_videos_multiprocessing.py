@@ -33,8 +33,8 @@ FONT_SIZE = 1
 FONT_THICKNESS = 1
 HANDEDNESS_TEXT_COLOR = (88, 205, 54) # vibrant green
 
-resize_height = 224
-resize_width = 224
+resize_height = 256
+resize_width = 256
 
 def resize_video(data_path,dest_path):
 
