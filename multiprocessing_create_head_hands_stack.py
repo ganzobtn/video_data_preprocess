@@ -1,3 +1,4 @@
+
 import mediapipe as mp
 import os
 import cv2
@@ -5,6 +6,9 @@ import numpy as np
 import argparse
 
 import time
+import os
+from concurrent.futures import ThreadPoolExecutor
+
 parser = argparse.ArgumentParser()
 
 parser.add_argument('--data_path', type=str,
@@ -16,21 +20,19 @@ parser.add_argument('--dest_path', type=str,
 opt = parser.parse_args()
 
 
-data_path = '/home/ganzorig/Datas/chalearn_processed_full/color/'
-dest_path = '/home/ganzorig/Datas/chalearn_processed_full_skeleton/color/'
-
-MARGIN =10
+data_path = opt.data_path#'/home/ganzorig/Datas/chalearn_processed_full/color/'
+dest_path = opt.dest_path#'/home/ganzorig/Datas/chalearn_processed_full_skeleton/color/'
 
 mp_drawing = mp.solutions.drawing_utils
 mp_drawing_styles = mp.solutions.drawing_styles
 mp_holistic = mp.solutions.holistic
 
 
-
 MARGIN = 10  # pixels
 FONT_SIZE = 1
 FONT_THICKNESS = 1
 HANDEDNESS_TEXT_COLOR = (88, 205, 54) # vibrant green
+
 
 
 def get_features(data_path, dest_path):
@@ -122,6 +124,7 @@ def get_crop(image, landmarks):
     return min_x,min_y,max_x,max_y, text_x,text_y
 
 def get_head_hands(data_path, dest_path):
+
     cap = cv2.VideoCapture(data_path)
 
     frame_width, frame_height = int(cap.get(3)), int(cap.get(4))
@@ -160,25 +163,25 @@ def get_head_hands(data_path, dest_path):
             image.flags.writeable = True
             image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
 
-            # Right Hand
-            mp_drawing.draw_landmarks(
-               blank, results.right_hand_landmarks, mp_holistic.HAND_CONNECTIONS)
-            #  Left Hand
-            mp_drawing.draw_landmarks(
-               blank, results.left_hand_landmarks, mp_holistic.HAND_CONNECTIONS)
-            mp_drawing.draw_landmarks(
-               blank,
-               results.face_landmarks,
-               mp_holistic.FACEMESH_CONTOURS,
-               landmark_drawing_spec=None,
-               connection_drawing_spec=mp_drawing_styles
-               .get_default_face_mesh_contours_style())
-            mp_drawing.draw_landmarks(
-               blank,
-               results.pose_landmarks,
-               mp_holistic.POSE_CONNECTIONS,
-               landmark_drawing_spec=mp_drawing_styles
-               .get_default_pose_landmarks_style())
+            # # Right Hand
+            # mp_drawing.draw_landmarks(
+            #    blank, results.right_hand_landmarks, mp_holistic.HAND_CONNECTIONS)
+            # #  Left Hand
+            # mp_drawing.draw_landmarks(
+            #    blank, results.left_hand_landmarks, mp_holistic.HAND_CONNECTIONS)
+            # mp_drawing.draw_landmarks(
+            #    blank,
+            #    results.face_landmarks,
+            #    mp_holistic.FACEMESH_CONTOURS,
+            #    landmark_drawing_spec=None,
+            #    connection_drawing_spec=mp_drawing_styles
+            #    .get_default_face_mesh_contours_style())
+            # mp_drawing.draw_landmarks(
+            #    blank,
+            #    results.pose_landmarks,
+            #    mp_holistic.POSE_CONNECTIONS,
+            #    landmark_drawing_spec=mp_drawing_styles
+            #    .get_default_pose_landmarks_style())
             #print('ff:',type(results.face_landmarks))
             #print('ddd:',results.face_landmarks.landmark[0])
             #print('--------------------')
@@ -251,32 +254,60 @@ def get_head_hands(data_path, dest_path):
     cap.release()
     out.release()
 
+# Define your video processing function
+def process_video(file_path):
+    root =file_path[0]
+    file= file_path[1]
+    dest_path_new = file_path[2] 
+    if not os.path.exists(dest_path_new):      
+        os.makedirs(dest_path_new,exist_ok=True)
+    # You can return some result if needed
+    video_path = os.path.join(root,file)
+
+    get_head_hands(data_path= video_path, dest_path = os.path.join(dest_path_new,file))
+
+    return f"Processed {video_path}"
+
+#def main():
+#    video_dir = "path_to_video_directory"  # Replace with the path to your video directory
+#    video_files = [os.path.join(video_dir, file) for file in os.listdir(video_dir) if file.endswith(".mp4")]#
+#
+#    # Create a ThreadPoolExecutor with the number of CPU cores you want to use
+#    num_cpus = os.cpu_count()  # This gets the number of available CPU cores
+#    with ThreadPoolExecutor(max_workers=num_cpus) as executor:
+#        # Process videos in parallel
+#        results = list(executor.map(process_video, video_files))#
+#
+#    # Print the results
+#    for result in results:
+#        print(result)
+
+
 def main():
+    file_list = []
     for (root,dirs,files) in os.walk(data_path, topdown=True):
-    #print (root)
-    #print (dirs)
-    #print (files)
         for file in files:
             if file.endswith('.mp4'):
                 #print(os.path.join(root,file))
                 dest_path_new = root.replace(data_path,dest_path)
-                if not os.path.exists(dest_path_new):      
-                    os.makedirs(dest_path_new)
+                #if not os.path.exists(dest_path_new):      
+                #    os.makedirs(dest_path_new)
                 #createFolder()
-
+                file_list.append([root,file,dest_path_new])
                 #get_features(data_path=os.path.join(root,file), dest_path = os.path.join(dest_path_new,file))
-                get_head_hands(data_path=os.path.join(root,file), dest_path = os.path.join(dest_path_new,file))
+
+    num_cpus = os.cpu_count()  # This gets the number of available CPU cores
+    with ThreadPoolExecutor(max_workers=num_cpus) as executor:
+        # Process videos in parallel
+        results = list(executor.map(process_video, files))
+
+    # Print the results
+    for result in results:
+        print(result)
+
+
         print ('--------------------------------')
 
 
-
-if __name__=='__main__':
-
-    #data_path = '/tmp/data/wlasl_2000/WLASL2000'
-    #dest_path = '/tmp/data/wlasl_2000/wlasl_2000_head_hands_stack/WLASL2000'
-    print("Hi")
+if __name__ == "__main__":
     main()
-    #pass
-
-
-    #get_head_hands(data_path=data_path,dest_path= dest_path)
