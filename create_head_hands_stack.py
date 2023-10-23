@@ -16,8 +16,8 @@ parser.add_argument('--dest_path', type=str,
 opt = parser.parse_args()
 
 
-#data_path = '/home/ganzorig/Datas/chalearn_processed_full/color/'
-#dest_path = '/home/ganzorig/Datas/chalearn_processed_full_skeleton/color/'
+data_path = '/home/ganzorig/Datas/chalearn_processed_full/color/'
+dest_path = '/home/ganzorig/Datas/chalearn_processed_full_skeleton/color/'
 
 MARGIN =10
 
