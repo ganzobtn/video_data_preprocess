@@ -1,10 +1,8 @@
 
-#import mediapipe as mp
 import os
 import cv2
 import numpy as np
 import argparse
-
 import time
 import os
 from concurrent.futures import ThreadPoolExecutor
@@ -23,17 +21,8 @@ opt = parser.parse_args()
 data_path = opt.data_path#'/home/ganzorig/Datas/chalearn_processed_full/color/'
 dest_path = opt.dest_path#'/home/ganzorig/Datas/chalearn_processed_full_skeleton/color/'
 
-
-MARGIN = 10  # pixels
-FONT_SIZE = 1
-FONT_THICKNESS = 1
-HANDEDNESS_TEXT_COLOR = (88, 205, 54) # vibrant green
-
-resize_height = 256
-resize_width = 256
-
-def resize_video(data_path,dest_path):
-
+def resize_video(data_path, dest_path):
+    #print(data_path, dest_path)
     cap = cv2.VideoCapture(data_path)
 
     frame_width, frame_height = int(cap.get(3)), int(cap.get(4))
@@ -41,41 +30,51 @@ def resize_video(data_path,dest_path):
     fps = cap.get(cv2.CAP_PROP_FPS)
     
     out = cv2.VideoWriter(dest_path, cv2.VideoWriter_fourcc(
-        *'mp4v'), fps, (resize_width, resize_height))
+        *'mp4v'), fps, (frame_width, frame_height))
     #out = cv2.VideoWriter(dest_path, cv2.VideoWriter_fourcc(
     #    *'mp4v'), fps, (224, 224))
-    
     while cap.isOpened():
         success, image = cap.read()
         if not success:
-            print('data:',data_path)
+
+            #print("Ignoring empty camera frame.")
+            print(data_path)
             # If loading a video, use 'break' instead of 'continue'.
             break
 
-        img_resized = cv2.resize(image,(resize_height,resize_width))
 
-        image.flags.writeable = True
+        img_resized = cv2.resize(image,(224,224))
 
         out.write(img_resized)
-
     cap.release()
     out.release()
 
 # Define your video processing function
 def process_video(file_path):
-    #print(len(file_path),type(file_path))
-    print(file_path)
     root =file_path[0]
     file= file_path[1]
-    dest_path_new = file_path[2]
+    dest_path_new = file_path[2] 
     if not os.path.exists(dest_path_new):      
-        os.makedirs(dest_path_new,exist_ok= True)
+        os.makedirs(dest_path_new,exist_ok=True)
     # You can return some result if needed
     video_path = os.path.join(root,file)
 
     resize_video(data_path= video_path, dest_path = os.path.join(dest_path_new,file))
-
     return f"Processed {video_path}"
+
+# def main():
+#    video_dir = opt.data_path # Replace with the path to your video directory
+#    video_files = [os.path.join(video_dir, file) for file in os.listdir(video_dir) if file.endswith(".mp4")]#
+
+#    # Create a ThreadPoolExecutor with the number of CPU cores you want to use
+#    num_cpus = os.cpu_count()  # This gets the number of available CPU cores
+#    with ThreadPoolExecutor(max_workers=num_cpus) as executor:
+#        # Process videos in parallel
+#        results = list(executor.map(process_video, video_files))#
+
+#    # Print the results
+#    for result in results:
+#        print(result)
 
 
 def main():
