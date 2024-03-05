@@ -16,10 +16,10 @@ parser.add_argument('--dest_path', type=str,
 
 opt = parser.parse_args()
 
-
-data_path = '/home/ganzorig/Datas/chalearn_processed_full/color/'
-dest_path = '/home/ganzorig/Datas/chalearn_processed_full_skeleton/color/'
-
+#data_path = '/home/ganzorig/Datas/chalearn_processed_full/color/'
+#dest_path = '/home/ganzorig/Datas/chalearn_processed_full_skeleton/color/'
+data_path = opt.data_path
+dest_path = opt.dest_path
 MARGIN =10
 
 mp_drawing = mp.solutions.drawing_utils
@@ -252,22 +252,22 @@ def get_head_hands(data_path, dest_path):
     cap.release()
     out.release()
 
-def main():
-    for (root,dirs,files) in os.walk(data_path, topdown=True):
-    #print (root)
-    #print (dirs)
-    #print (files)
-        for file in files:
-            if file.endswith('.mp4'):
-                #print(os.path.join(root,file))
-                dest_path_new = root.replace(data_path,dest_path)
-                if not os.path.exists(dest_path_new):      
-                    os.makedirs(dest_path_new)
-                #createFolder()
+# def main():
+#     for (root,dirs,files) in os.walk(data_path, topdown=True):
+#     #print (root)
+#     #print (dirs)
+#     #print (files)
+#         for file in files:
+#             if file.endswith('.mp4'):
+#                 #print(os.path.join(root,file))
+#                 dest_path_new = root.replace(data_path,dest_path)
+#                 if not os.path.exists(dest_path_new):      
+#                     os.makedirs(dest_path_new)
+#                 #createFolder()
 
-                #get_features(data_path=os.path.join(root,file), dest_path = os.path.join(dest_path_new,file))
-                get_head_hands(data_path=os.path.join(root,file), dest_path = os.path.join(dest_path_new,file))
-        print ('--------------------------------')
+#                 #get_features(data_path=os.path.join(root,file), dest_path = os.path.join(dest_path_new,file))
+#                 get_head_hands(data_path=os.path.join(root,file), dest_path = os.path.join(dest_path_new,file))
+#         print ('--------------------------------')
 
 
 
@@ -280,4 +280,27 @@ def main():
 #     #pass
 
 
-gi
+#get_head_hands(data_path=data_path,dest_path= dest_path)
+if __name__ == '__main__':
+    # Get the number of CPUs
+    num_cpus = multiprocessing.cpu_count()
+    
+    # Create a pool of worker processes
+    pool = multiprocessing.Pool(processes=num_cpus)
+    
+    # Define the function to be executed in parallel
+    def process_file(file):
+        # Replace the code inside the loop with the desired processing logic
+        if file.endswith('.mp4'):
+            dest_path_new = root.replace(data_path, dest_path)
+            if not os.path.exists(dest_path_new):
+                get_head_hands(data_path=os.path.join(root, file), dest_path=os.path.join(dest_path_new, file))
+    
+    # Iterate over the files and submit them to the pool for processing
+    for (root, dirs, files) in os.walk(data_path, topdown=True):
+        for file in files:
+            pool.apply_async(process_file, args=(file,))
+    
+    # Close the pool and wait for all processes to finish
+    pool.close()
+    pool.join()
