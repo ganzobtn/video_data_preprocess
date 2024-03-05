@@ -1,5 +1,5 @@
 
-import mediapipe as mp
+#mport mediapipe as mp
 import os
 import cv2
 import numpy as np
@@ -23,9 +23,9 @@ opt = parser.parse_args()
 data_path = opt.data_path#'/home/ganzorig/Datas/chalearn_processed_full/color/'
 dest_path = opt.dest_path#'/home/ganzorig/Datas/chalearn_processed_full_skeleton/color/'
 
-mp_drawing = mp.solutions.drawing_utils
-mp_drawing_styles = mp.solutions.drawing_styles
-mp_holistic = mp.solutions.holistic
+# mp_drawing = mp.solutions.drawing_utils
+# mp_drawing_styles = mp.solutions.drawing_styles
+# mp_holistic = mp.solutions.holistic
 
 
 MARGIN = 10  # pixels
@@ -33,8 +33,8 @@ FONT_SIZE = 1
 FONT_THICKNESS = 1
 HANDEDNESS_TEXT_COLOR = (88, 205, 54) # vibrant green
 
-resize_height = 256
-resize_width = 256
+resize_height = 240
+resize_width = 320
 
 def resize_video(data_path,dest_path):
 
@@ -42,6 +42,7 @@ def resize_video(data_path,dest_path):
 
     frame_width, frame_height = int(cap.get(3)), int(cap.get(4))
     #(1920, 1080)
+    print('n_frame:',cap.get(cv2.CAP_PROP_FRAME_COUNT))
     fps = cap.get(cv2.CAP_PROP_FPS)
     
     out = cv2.VideoWriter(dest_path, cv2.VideoWriter_fourcc(
@@ -52,7 +53,8 @@ def resize_video(data_path,dest_path):
     while cap.isOpened():
         success, image = cap.read()
         if not success:
-            print("Ignoring empty camera frame.")
+            print('data:',data_path)
+            #print("Ignoring empty camera frame.")
             # If loading a video, use 'break' instead of 'continue'.
             break
         image.flags.writeable = False
@@ -67,7 +69,7 @@ def resize_video(data_path,dest_path):
 
 # Define your video processing function
 def process_video(file_path):
-    print(len(file_path),type(file_path))
+    #print(len(file_path),type(file_path))
     root =file_path[0]
     file= file_path[1]
     dest_path_new = file_path[2]
