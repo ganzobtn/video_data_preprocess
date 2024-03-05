@@ -280,27 +280,4 @@ def main():
 #     #pass
 
 
-#get_head_hands(data_path=data_path,dest_path= dest_path)
-if __name__ == '__main__':
-    # Get the number of CPUs
-    num_cpus = multiprocessing.cpu_count()
-    
-    # Create a pool of worker processes
-    pool = multiprocessing.Pool(processes=num_cpus)
-    
-    # Define the function to be executed in parallel
-    def process_file(file):
-        # Replace the code inside the loop with the desired processing logic
-        if file.endswith('.mp4'):
-            dest_path_new = root.replace(data_path, dest_path)
-            if not os.path.exists(dest_path_new):
-                get_head_hands(data_path=os.path.join(root, file), dest_path=os.path.join(dest_path_new, file))
-    
-    # Iterate over the files and submit them to the pool for processing
-    for (root, dirs, files) in os.walk(data_path, topdown=True):
-        for file in files:
-            pool.apply_async(process_file, args=(file,))
-    
-    # Close the pool and wait for all processes to finish
-    pool.close()
-    pool.join()
+gi
