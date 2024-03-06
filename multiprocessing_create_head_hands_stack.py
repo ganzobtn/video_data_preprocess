@@ -81,19 +81,19 @@ def get_features(data_path, dest_path):
             mp_drawing.draw_landmarks(
                 blank, results.left_hand_landmarks, mp_holistic.HAND_CONNECTIONS)
 
-            mp_drawing.draw_landmarks(
-                blank,
-                results.face_landmarks,
-                mp_holistic.FACEMESH_CONTOURS,
-                landmark_drawing_spec=None,
-                connection_drawing_spec=mp_drawing_styles
-                .get_default_face_mesh_contours_style())
-            mp_drawing.draw_landmarks(
-                blank,
-                results.pose_landmarks,
-                mp_holistic.POSE_CONNECTIONS,
-                landmark_drawing_spec=mp_drawing_styles
-                .get_default_pose_landmarks_style())
+            # mp_drawing.draw_landmarks(
+            #     blank,
+            #     results.face_landmarks,
+            #     mp_holistic.FACEMESH_CONTOURS,
+            #     landmark_drawing_spec=None,
+            #     connection_drawing_spec=mp_drawing_styles
+            #     .get_default_face_mesh_contours_style())
+            # mp_drawing.draw_landmarks(
+            #     blank,
+            #     results.pose_landmarks,
+            #     mp_holistic.POSE_CONNECTIONS,
+            #     landmark_drawing_spec=mp_drawing_styles
+            #     .get_default_pose_landmarks_style())
             # Flip the image horizontally for a selfie-view display.
             out.write(blank)
             #cv2.imshow('MediaPipe Holistic', cv2.flip(blank, 1))
@@ -189,7 +189,7 @@ def get_head_hands(data_path, dest_path):
             #new_img = np.zeros((224,224,3),dtype=int)
             new_img= np.zeros_like(image)
 
-            img_whole = cv2.resize(blank, (int(frame_height/2),int(frame_width/2)))
+            img_whole = cv2.resize(blank, (int(frame_width/2),int(frame_height/2)))
 
             new_img[:half_height,:half_width]= img_whole
             
@@ -200,13 +200,13 @@ def get_head_hands(data_path, dest_path):
             if landmarks is not None:
                 min_x,min_y,max_x,max_y, text_x,text_y = get_crop(image,landmarks.landmark)
                 color = (255, 0, 0)
-                cv2.putText(blank, "Face",
-                (text_x, text_y), cv2.FONT_HERSHEY_DUPLEX,
-                FONT_SIZE, HANDEDNESS_TEXT_COLOR, FONT_THICKNESS, cv2.LINE_AA)
+                # cv2.putText(blank, "Face",
+                # (text_x, text_y), cv2.FONT_HERSHEY_DUPLEX,
+                # FONT_SIZE, HANDEDNESS_TEXT_COLOR, FONT_THICKNESS, cv2.LINE_AA)
                 blank = cv2.rectangle(blank, (min_x,min_y), (max_x,max_y), color, thickness=2)
                 #img_whole = cv2.resize(blank[min_y:max_y,min_x:max_x],(256,256))
                 
-                img_whole = cv2.resize(image[min_y:max_y,min_x:max_x],(256,256))
+                img_whole = cv2.resize(image[min_y:max_y,min_x:max_x],(half_width,half_height))
                 #new_img[112:,:112]= img_whole
                 new_img[half_height:,:half_width]= img_whole
 
@@ -217,12 +217,12 @@ def get_head_hands(data_path, dest_path):
                 min_x,min_y,max_x,max_y, text_x,text_y = get_crop(image,landmarks.landmark)
                 color = (255, 0, 0)
                 blank = cv2.rectangle(blank, (min_x,min_y), (max_x,max_y), color, thickness=2)
-                cv2.putText(blank, "Left Hand",
-                (text_x, text_y), cv2.FONT_HERSHEY_DUPLEX,
-                FONT_SIZE, HANDEDNESS_TEXT_COLOR, FONT_THICKNESS, cv2.LINE_AA)
+                # cv2.putText(blank, "Left Hand",
+                # (text_x, text_y), cv2.FONT_HERSHEY_DUPLEX,
+                # FONT_SIZE, HANDEDNESS_TEXT_COLOR, FONT_THICKNESS, cv2.LINE_AA)
                 #img_whole = cv2.resize(blank[min_y:max_y,min_x:max_x],(256,256))
 
-                img_whole = cv2.resize(image[min_y:max_y,min_x:max_x],(256,256))
+                img_whole = cv2.resize(image[min_y:max_y,min_x:max_x],(half_width,half_height))
                 #new_img[112:,112:]= img_whole
                 new_img[half_height:,half_width:]= img_whole
             #Right Hand
@@ -232,18 +232,18 @@ def get_head_hands(data_path, dest_path):
                 min_x,min_y,max_x,max_y, text_x,text_y = get_crop(image,landmarks.landmark)
                 color = (255, 0, 0)
                 blank = cv2.rectangle(blank, (min_x,min_y), (max_x,max_y), color, thickness=2)
-                cv2.putText(blank, "Right Hand",
-                (text_x, text_y), cv2.FONT_HERSHEY_DUPLEX,
-                FONT_SIZE, HANDEDNESS_TEXT_COLOR, FONT_THICKNESS, cv2.LINE_AA)
-                img_whole = cv2.resize(image[min_y:max_y,min_x:max_x],(256,256))
+                # cv2.putText(blank, "Right Hand",
+                # (text_x, text_y), cv2.FONT_HERSHEY_DUPLEX,
+                # FONT_SIZE, HANDEDNESS_TEXT_COLOR, FONT_THICKNESS, cv2.LINE_AA)
+                img_whole = cv2.resize(image[min_y:max_y,min_x:max_x],(half_width,half_height))
                 #img_whole = cv2.resize(blank[min_y:max_y,min_x:max_x],(256,256))
 
                 #new_img[:112,112:]= img_whole
                 new_img[:half_height:,half_width:]= img_whole
             # Flip the image horizontally for a selfie-view display.
             new_img_resized = cv2.resize(new_img,(frame_height,frame_width))
-            print(new_img_resized.shape)
-            print(blank.shape)
+            # print(new_img_resized.shape)
+            # print(blank.shape)
             out.write(new_img_resized)
             #cv2.imshow('MediaPipe Holistic', cv2.flip(blank, 1))
             #if cv2.waitKey(5) & 0xFF == 27:
@@ -299,7 +299,7 @@ def main():
     num_cpus = os.cpu_count()  # This gets the number of available CPU cores
     with ThreadPoolExecutor(max_workers=num_cpus) as executor:
         # Process videos in parallel
-        results = list(executor.map(process_video, files))
+        results = list(executor.map(process_video, file_list))
 
     # Print the results
     for result in results:

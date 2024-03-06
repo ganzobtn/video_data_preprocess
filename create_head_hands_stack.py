@@ -123,6 +123,7 @@ def get_crop(image, landmarks):
     return min_x,min_y,max_x,max_y, text_x,text_y
 
 def get_head_hands(data_path, dest_path):
+
     cap = cv2.VideoCapture(data_path)
 
     frame_width, frame_height = int(cap.get(3)), int(cap.get(4))
@@ -161,25 +162,25 @@ def get_head_hands(data_path, dest_path):
             image.flags.writeable = True
             image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
 
-            # Right Hand
-            mp_drawing.draw_landmarks(
-               blank, results.right_hand_landmarks, mp_holistic.HAND_CONNECTIONS)
-            #  Left Hand
-            mp_drawing.draw_landmarks(
-               blank, results.left_hand_landmarks, mp_holistic.HAND_CONNECTIONS)
-            mp_drawing.draw_landmarks(
-               blank,
-               results.face_landmarks,
-               mp_holistic.FACEMESH_CONTOURS,
-               landmark_drawing_spec=None,
-               connection_drawing_spec=mp_drawing_styles
-               .get_default_face_mesh_contours_style())
-            mp_drawing.draw_landmarks(
-               blank,
-               results.pose_landmarks,
-               mp_holistic.POSE_CONNECTIONS,
-               landmark_drawing_spec=mp_drawing_styles
-               .get_default_pose_landmarks_style())
+            # # Right Hand
+            # mp_drawing.draw_landmarks(
+            #    blank, results.right_hand_landmarks, mp_holistic.HAND_CONNECTIONS)
+            # #  Left Hand
+            # mp_drawing.draw_landmarks(
+            #    blank, results.left_hand_landmarks, mp_holistic.HAND_CONNECTIONS)
+            # mp_drawing.draw_landmarks(
+            #    blank,
+            #    results.face_landmarks,
+            #    mp_holistic.FACEMESH_CONTOURS,
+            #    landmark_drawing_spec=None,
+            #    connection_drawing_spec=mp_drawing_styles
+            #    .get_default_face_mesh_contours_style())
+            # mp_drawing.draw_landmarks(
+            #    blank,
+            #    results.pose_landmarks,
+            #    mp_holistic.POSE_CONNECTIONS,
+            #    landmark_drawing_spec=mp_drawing_styles
+            #    .get_default_pose_landmarks_style())
             #print('ff:',type(results.face_landmarks))
             #print('ddd:',results.face_landmarks.landmark[0])
             #print('--------------------')
@@ -187,7 +188,7 @@ def get_head_hands(data_path, dest_path):
             #new_img = np.zeros((224,224,3),dtype=int)
             new_img= np.zeros_like(image)
 
-            img_whole = cv2.resize(blank, (int(frame_height/2),int(frame_width/2)))
+            img_whole = cv2.resize(blank, (int(frame_width/2),int(frame_height/2)))
 
             new_img[:half_height,:half_width]= img_whole
             
@@ -198,13 +199,13 @@ def get_head_hands(data_path, dest_path):
             if landmarks is not None:
                 min_x,min_y,max_x,max_y, text_x,text_y = get_crop(image,landmarks.landmark)
                 color = (255, 0, 0)
-                cv2.putText(blank, "Face",
-                (text_x, text_y), cv2.FONT_HERSHEY_DUPLEX,
-                FONT_SIZE, HANDEDNESS_TEXT_COLOR, FONT_THICKNESS, cv2.LINE_AA)
+                # cv2.putText(blank, "Face",
+                # (text_x, text_y), cv2.FONT_HERSHEY_DUPLEX,
+                # FONT_SIZE, HANDEDNESS_TEXT_COLOR, FONT_THICKNESS, cv2.LINE_AA)
                 blank = cv2.rectangle(blank, (min_x,min_y), (max_x,max_y), color, thickness=2)
                 #img_whole = cv2.resize(blank[min_y:max_y,min_x:max_x],(256,256))
                 
-                img_whole = cv2.resize(image[min_y:max_y,min_x:max_x],(256,256))
+                img_whole = cv2.resize(image[min_y:max_y,min_x:max_x],(half_width,half_height))
                 #new_img[112:,:112]= img_whole
                 new_img[half_height:,:half_width]= img_whole
 
@@ -215,12 +216,12 @@ def get_head_hands(data_path, dest_path):
                 min_x,min_y,max_x,max_y, text_x,text_y = get_crop(image,landmarks.landmark)
                 color = (255, 0, 0)
                 blank = cv2.rectangle(blank, (min_x,min_y), (max_x,max_y), color, thickness=2)
-                cv2.putText(blank, "Left Hand",
-                (text_x, text_y), cv2.FONT_HERSHEY_DUPLEX,
-                FONT_SIZE, HANDEDNESS_TEXT_COLOR, FONT_THICKNESS, cv2.LINE_AA)
+                # cv2.putText(blank, "Left Hand",
+                # (text_x, text_y), cv2.FONT_HERSHEY_DUPLEX,
+                # FONT_SIZE, HANDEDNESS_TEXT_COLOR, FONT_THICKNESS, cv2.LINE_AA)
                 #img_whole = cv2.resize(blank[min_y:max_y,min_x:max_x],(256,256))
 
-                img_whole = cv2.resize(image[min_y:max_y,min_x:max_x],(256,256))
+                img_whole = cv2.resize(image[min_y:max_y,min_x:max_x],(half_width,half_height))
                 #new_img[112:,112:]= img_whole
                 new_img[half_height:,half_width:]= img_whole
             #Right Hand
@@ -230,18 +231,18 @@ def get_head_hands(data_path, dest_path):
                 min_x,min_y,max_x,max_y, text_x,text_y = get_crop(image,landmarks.landmark)
                 color = (255, 0, 0)
                 blank = cv2.rectangle(blank, (min_x,min_y), (max_x,max_y), color, thickness=2)
-                cv2.putText(blank, "Right Hand",
-                (text_x, text_y), cv2.FONT_HERSHEY_DUPLEX,
-                FONT_SIZE, HANDEDNESS_TEXT_COLOR, FONT_THICKNESS, cv2.LINE_AA)
-                img_whole = cv2.resize(image[min_y:max_y,min_x:max_x],(256,256))
+                # cv2.putText(blank, "Right Hand",
+                # (text_x, text_y), cv2.FONT_HERSHEY_DUPLEX,
+                # FONT_SIZE, HANDEDNESS_TEXT_COLOR, FONT_THICKNESS, cv2.LINE_AA)
+                img_whole = cv2.resize(image[min_y:max_y,min_x:max_x],(half_width,half_height))
                 #img_whole = cv2.resize(blank[min_y:max_y,min_x:max_x],(256,256))
 
                 #new_img[:112,112:]= img_whole
                 new_img[:half_height:,half_width:]= img_whole
             # Flip the image horizontally for a selfie-view display.
             new_img_resized = cv2.resize(new_img,(frame_height,frame_width))
-            print(new_img_resized.shape)
-            print(blank.shape)
+            # print(new_img_resized.shape)
+            # print(blank.shape)
             out.write(new_img_resized)
             #cv2.imshow('MediaPipe Holistic', cv2.flip(blank, 1))
             #if cv2.waitKey(5) & 0xFF == 27:
@@ -252,55 +253,55 @@ def get_head_hands(data_path, dest_path):
     cap.release()
     out.release()
 
-# def main():
-#     for (root,dirs,files) in os.walk(data_path, topdown=True):
-#     #print (root)
-#     #print (dirs)
-#     #print (files)
-#         for file in files:
-#             if file.endswith('.mp4'):
-#                 #print(os.path.join(root,file))
-#                 dest_path_new = root.replace(data_path,dest_path)
-#                 if not os.path.exists(dest_path_new):      
-#                     os.makedirs(dest_path_new)
-#                 #createFolder()
-
-#                 #get_features(data_path=os.path.join(root,file), dest_path = os.path.join(dest_path_new,file))
-#                 get_head_hands(data_path=os.path.join(root,file), dest_path = os.path.join(dest_path_new,file))
-#         print ('--------------------------------')
-
-
-
-# if __name__=='__main__':
-
-#     #data_path = '/tmp/data/wlasl_2000/WLASL2000'
-#     #dest_path = '/tmp/data/wlasl_2000/wlasl_2000_head_hands_stack/WLASL2000'
-#     print("Hi")
-#     main()
-#     #pass
-
-
-#get_head_hands(data_path=data_path,dest_path= dest_path)
-if __name__ == '__main__':
-    # Get the number of CPUs
-    num_cpus = multiprocessing.cpu_count()
-    
-    # Create a pool of worker processes
-    pool = multiprocessing.Pool(processes=num_cpus)
-    
-    # Define the function to be executed in parallel
-    def process_file(file):
-        # Replace the code inside the loop with the desired processing logic
-        if file.endswith('.mp4'):
-            dest_path_new = root.replace(data_path, dest_path)
-            if not os.path.exists(dest_path_new):
-                get_head_hands(data_path=os.path.join(root, file), dest_path=os.path.join(dest_path_new, file))
-    
-    # Iterate over the files and submit them to the pool for processing
-    for (root, dirs, files) in os.walk(data_path, topdown=True):
+def main():
+    for (root,dirs,files) in os.walk(data_path, topdown=True):
+    #print (root)
+    #print (dirs)
+    #print (files)
         for file in files:
-            pool.apply_async(process_file, args=(file,))
+            if file.endswith('.mp4'):
+                #print(os.path.join(root,file))
+                dest_path_new = root.replace(data_path,dest_path)
+                if not os.path.exists(dest_path_new):      
+                    os.makedirs(dest_path_new)
+                #createFolder()
+
+                #get_features(data_path=os.path.join(root,file), dest_path = os.path.join(dest_path_new,file))
+                get_head_hands(data_path=os.path.join(root,file), dest_path = os.path.join(dest_path_new,file))
+        print ('--------------------------------')
+
+
+
+if __name__=='__main__':
+
+    #data_path = '/tmp/data/wlasl_2000/WLASL2000'
+    #dest_path = '/tmp/data/wlasl_2000/wlasl_2000_head_hands_stack/WLASL2000'
+    print("Hi")
+    main()
+    #pass
+
+
+# #get_head_hands(data_path=data_path,dest_path= dest_path)
+# if __name__ == '__main__':
+#     # Get the number of CPUs
+#     num_cpus = os.cpu_count()
     
-    # Close the pool and wait for all processes to finish
-    pool.close()
-    pool.join()
+#     # Create a pool of worker processes
+#     pool = multiprocessing.Pool(processes=num_cpus)
+    
+#     # Define the function to be executed in parallel
+#     def process_file(file):
+#         # Replace the code inside the loop with the desired processing logic
+#         if file.endswith('.mp4'):
+#             dest_path_new = root.replace(data_path, dest_path)
+#             if not os.path.exists(dest_path_new):
+#                 get_head_hands(data_path=os.path.join(root, file), dest_path=os.path.join(dest_path_new, file))
+    
+#     # Iterate over the files and submit them to the pool for processing
+#     for (root, dirs, files) in os.walk(data_path, topdown=True):
+#         for file in files:
+#             pool.apply_async(process_file, args=(file,))
+    
+#     # Close the pool and wait for all processes to finish
+#     pool.close()
+#     pool.join()
