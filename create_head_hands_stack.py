@@ -6,6 +6,11 @@ import argparse
 
 import time
 import multiprocessing
+
+import time
+import os
+from concurrent.futures import ThreadPoolExecutor
+
 parser = argparse.ArgumentParser()
 
 parser.add_argument('--data_path', type=str,
@@ -20,7 +25,7 @@ opt = parser.parse_args()
 #dest_path = '/home/ganzorig/Datas/chalearn_processed_full_skeleton/color/'
 data_path = opt.data_path
 dest_path = opt.dest_path
-MARGIN =10
+MARGIN =30
 
 mp_drawing = mp.solutions.drawing_utils
 mp_drawing_styles = mp.solutions.drawing_styles
@@ -130,11 +135,14 @@ def get_head_hands(data_path, dest_path):
     #(1920, 1080)
     fps = cap.get(cv2.CAP_PROP_FPS)
     
-    out = cv2.VideoWriter(dest_path, cv2.VideoWriter_fourcc(
-        *'mp4v'), fps, (frame_width, frame_height))
+    # out = cv2.VideoWriter(dest_path, cv2.VideoWriter_fourcc(
+    #     *'mp4v'), fps, (frame_width, frame_height))
     #out = cv2.VideoWriter(dest_path, cv2.VideoWriter_fourcc(
     #    *'mp4v'), fps, (224, 224))
     
+    out = cv2.VideoWriter(
+        dest_path, cv2.VideoWriter_fourcc(*'mp4v'), fps, (frame_width, frame_height)
+    )
     with mp_holistic.Holistic(
             min_detection_confidence=0.2,
             min_tracking_confidence=0.2,
@@ -188,8 +196,10 @@ def get_head_hands(data_path, dest_path):
             #new_img = np.zeros((224,224,3),dtype=int)
             new_img= np.zeros_like(image)
 
-            img_whole = cv2.resize(blank, (int(frame_width/2),int(frame_height/2)))
-
+            #img_whole = cv2.resize(blank, (int(frame_height/2),int(frame_width/2)))
+            
+            img_whole = cv2.resize(blank, (half_width,half_height))
+            print(img_whole.shape,half_height,half_width)
             new_img[:half_height,:half_width]= img_whole
             
 
@@ -240,68 +250,75 @@ def get_head_hands(data_path, dest_path):
                 #new_img[:112,112:]= img_whole
                 new_img[:half_height:,half_width:]= img_whole
             # Flip the image horizontally for a selfie-view display.
-            new_img_resized = cv2.resize(new_img,(frame_height,frame_width))
+            new_img_resized = cv2.resize(new_img,(frame_width,frame_height))
             # print(new_img_resized.shape)
             # print(blank.shape)
             out.write(new_img_resized)
-            #cv2.imshow('MediaPipe Holistic', cv2.flip(blank, 1))
+            #cv2.imshow('MediaPipe Holistic', cv2.flip(new_img_resized, 1))
+            
+            #cv2.imshow('MediaPipe Holistic', cv2.flip(new_img_resized, 1))
             #if cv2.waitKey(5) & 0xFF == 27:
-            #    break
+            #   break
     #time.sleep(1)
 
     #cv2.destroyWindow('MediaPipe Holistic')
     cap.release()
     out.release()
 
+# def main():
+#     for (root,dirs,files) in os.walk(data_path, topdown=True):
+#     #print (root)
+#     #print (dirs)
+#     #print (files)
+#         for file in files:
+#             if file.endswith('.mp4'):
+#                 #print(os.path.join(root,file))
+#                 dest_path_new = root.replace(data_path,dest_path)
+#                 if not os.path.exists(dest_path_new):      
+#                     os.makedirs(dest_path_new)
+#                 #createFolder()
+
+#                 #get_features(data_path=os.path.join(root,file), dest_path = os.path.join(dest_path_new,file))
+#                 get_head_hands(data_path=os.path.join(root,file), dest_path = os.path.join(dest_path_new,file))
+#         print ('--------------------------------')
+
+
+
+# if __name__=='__main__':
+
+#     #data_path = '/tmp/data/wlasl_2000/WLASL2000'
+#     #dest_path = '/tmp/data/wlasl_2000/wlasl_2000_head_hands_stack/WLASL2000'
+#     print("Hi")
+#     main()
+#     #pass
+
+
+
 def main():
+    file_list = []
     for (root,dirs,files) in os.walk(data_path, topdown=True):
-    #print (root)
-    #print (dirs)
-    #print (files)
         for file in files:
             if file.endswith('.mp4'):
                 #print(os.path.join(root,file))
                 dest_path_new = root.replace(data_path,dest_path)
-                if not os.path.exists(dest_path_new):      
-                    os.makedirs(dest_path_new)
+                #if not os.path.exists(dest_path_new):      
+                #    os.makedirs(dest_path_new)
                 #createFolder()
-
+                file_list.append([root,file,dest_path_new])
                 #get_features(data_path=os.path.join(root,file), dest_path = os.path.join(dest_path_new,file))
-                get_head_hands(data_path=os.path.join(root,file), dest_path = os.path.join(dest_path_new,file))
+
+    num_cpus = os.cpu_count()  # This gets the number of available CPU cores
+    with ThreadPoolExecutor(max_workers=num_cpus) as executor:
+        # Process videos in parallel
+        results = list(executor.map(process_video, file_list))
+
+    # Print the results
+    for result in results:
+        print(result)
+
+
         print ('--------------------------------')
 
 
-
-if __name__=='__main__':
-
-    #data_path = '/tmp/data/wlasl_2000/WLASL2000'
-    #dest_path = '/tmp/data/wlasl_2000/wlasl_2000_head_hands_stack/WLASL2000'
-    print("Hi")
+if __name__ == "__main__":
     main()
-    #pass
-
-
-# #get_head_hands(data_path=data_path,dest_path= dest_path)
-# if __name__ == '__main__':
-#     # Get the number of CPUs
-#     num_cpus = os.cpu_count()
-    
-#     # Create a pool of worker processes
-#     pool = multiprocessing.Pool(processes=num_cpus)
-    
-#     # Define the function to be executed in parallel
-#     def process_file(file):
-#         # Replace the code inside the loop with the desired processing logic
-#         if file.endswith('.mp4'):
-#             dest_path_new = root.replace(data_path, dest_path)
-#             if not os.path.exists(dest_path_new):
-#                 get_head_hands(data_path=os.path.join(root, file), dest_path=os.path.join(dest_path_new, file))
-    
-#     # Iterate over the files and submit them to the pool for processing
-#     for (root, dirs, files) in os.walk(data_path, topdown=True):
-#         for file in files:
-#             pool.apply_async(process_file, args=(file,))
-    
-#     # Close the pool and wait for all processes to finish
-#     pool.close()
-#     pool.join()

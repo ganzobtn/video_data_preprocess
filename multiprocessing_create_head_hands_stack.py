@@ -28,10 +28,11 @@ mp_drawing_styles = mp.solutions.drawing_styles
 mp_holistic = mp.solutions.holistic
 
 
-MARGIN = 10  # pixels
+MARGIN = 30  # pixels
 FONT_SIZE = 1
 FONT_THICKNESS = 1
 HANDEDNESS_TEXT_COLOR = (88, 205, 54) # vibrant green
+
 
 
 
@@ -81,19 +82,19 @@ def get_features(data_path, dest_path):
             mp_drawing.draw_landmarks(
                 blank, results.left_hand_landmarks, mp_holistic.HAND_CONNECTIONS)
 
-            # mp_drawing.draw_landmarks(
-            #     blank,
-            #     results.face_landmarks,
-            #     mp_holistic.FACEMESH_CONTOURS,
-            #     landmark_drawing_spec=None,
-            #     connection_drawing_spec=mp_drawing_styles
-            #     .get_default_face_mesh_contours_style())
-            # mp_drawing.draw_landmarks(
-            #     blank,
-            #     results.pose_landmarks,
-            #     mp_holistic.POSE_CONNECTIONS,
-            #     landmark_drawing_spec=mp_drawing_styles
-            #     .get_default_pose_landmarks_style())
+            mp_drawing.draw_landmarks(
+                blank,
+                results.face_landmarks,
+                mp_holistic.FACEMESH_CONTOURS,
+                landmark_drawing_spec=None,
+                connection_drawing_spec=mp_drawing_styles
+                .get_default_face_mesh_contours_style())
+            mp_drawing.draw_landmarks(
+                blank,
+                results.pose_landmarks,
+                mp_holistic.POSE_CONNECTIONS,
+                landmark_drawing_spec=mp_drawing_styles
+                .get_default_pose_landmarks_style())
             # Flip the image horizontally for a selfie-view display.
             out.write(blank)
             #cv2.imshow('MediaPipe Holistic', cv2.flip(blank, 1))
@@ -131,11 +132,14 @@ def get_head_hands(data_path, dest_path):
     #(1920, 1080)
     fps = cap.get(cv2.CAP_PROP_FPS)
     
-    out = cv2.VideoWriter(dest_path, cv2.VideoWriter_fourcc(
-        *'mp4v'), fps, (frame_width, frame_height))
+    # out = cv2.VideoWriter(dest_path, cv2.VideoWriter_fourcc(
+    #     *'mp4v'), fps, (frame_width, frame_height))
     #out = cv2.VideoWriter(dest_path, cv2.VideoWriter_fourcc(
     #    *'mp4v'), fps, (224, 224))
     
+    out = cv2.VideoWriter(
+        dest_path, cv2.VideoWriter_fourcc(*'mp4v'), fps, (frame_width, frame_height)
+    )
     with mp_holistic.Holistic(
             min_detection_confidence=0.2,
             min_tracking_confidence=0.2,
@@ -153,7 +157,7 @@ def get_head_hands(data_path, dest_path):
             blank = image.copy()
             half_height = int(frame_height/2)
             half_width = int(frame_width/2)
-            print('blankK',blank.shape)
+            #print('blankK',blank.shape)
             image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
             shape = image.shape
             #blank = np.zeros_like(image)
@@ -189,8 +193,10 @@ def get_head_hands(data_path, dest_path):
             #new_img = np.zeros((224,224,3),dtype=int)
             new_img= np.zeros_like(image)
 
-            img_whole = cv2.resize(blank, (int(frame_width/2),int(frame_height/2)))
-
+            #img_whole = cv2.resize(blank, (int(frame_height/2),int(frame_width/2)))
+            
+            img_whole = cv2.resize(blank, (half_width,half_height))
+            #print(img_whole.shape,half_height,half_width)
             new_img[:half_height,:half_width]= img_whole
             
 
@@ -241,13 +247,15 @@ def get_head_hands(data_path, dest_path):
                 #new_img[:112,112:]= img_whole
                 new_img[:half_height:,half_width:]= img_whole
             # Flip the image horizontally for a selfie-view display.
-            new_img_resized = cv2.resize(new_img,(frame_height,frame_width))
+            new_img_resized = cv2.resize(new_img,(frame_width,frame_height))
             # print(new_img_resized.shape)
             # print(blank.shape)
             out.write(new_img_resized)
-            #cv2.imshow('MediaPipe Holistic', cv2.flip(blank, 1))
+            #cv2.imshow('MediaPipe Holistic', cv2.flip(new_img_resized, 1))
+            
+            #cv2.imshow('MediaPipe Holistic', cv2.flip(new_img_resized, 1))
             #if cv2.waitKey(5) & 0xFF == 27:
-            #    break
+            #   break
     #time.sleep(1)
 
     #cv2.destroyWindow('MediaPipe Holistic')
